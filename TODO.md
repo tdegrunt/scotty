@@ -9,10 +9,10 @@ TODO
 - Rethink the DSL (think of haproxy script for needs (including file templates))
 - Think about how to handle Roles (multiple components forming a role)
 - Think about separating installation and configuration? (config can change depending on situation)
--- First round: install all server with the correct role
--- Second round: update all configuration for the roles (including interaction)
+  - First round: install all server with the correct role
+  - Second round: update all configuration for the roles (including interaction)
 - Think about the combination of components and servers, now the component is "server aware" it should not be
--- server.install(:ruby) ??
+  - server.install(:ruby) ??
 
 - Items: haproxy, firewall, nginx, custom git stuff, mysql, mongo, rabbitmq
 
