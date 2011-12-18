@@ -1,30 +1,35 @@
 module Scotty
   class Component
-    attr_accessor :name, :server, :requires_apt, :provides, :install_script, :remove_script, :detect_files, :test_proc
+    attr_accessor :name, :server, :requires, :provides, :install_proc, :remove_proc, :detect_files, :test_proc
 
     def install_dependencies
       puts "Installing dependencies"
-      result = exec("aptitude install -y #{requires_apt.join(" ")}")
-
-      if result.status != 0
-        puts result.stdout
-        raise "Failed installing dependencies (#{requires_apt})"
-      end
-      result
+      raise "Not implemented" if requires
     end
 
     def install
-      install_dependencies
+      unless test
+        install_dependencies
 
-      puts "Installing #{name}"
-      result = exec(install_script)
-      puts "Testing #{name}"
-      if result.status != 0 || !detect || !test
-        # logger.debug
-        raise "Failed installing #{name}"
+        puts "Installing #{name}"
+        instance_eval &install_proc
+
+        puts "Testing #{name}"
+        raise "Failed installing #{name}" if  !detect || !test
+
+        register
+        puts "Finished installing #{name}"
       end
-      puts "Finished installing #{name}"
-      result
+    end
+
+    def remove
+      puts "Removing #{name}"
+      instance_eval &remove_proc
+
+      raise "Failed removing #{name}" if detect || test
+
+      deregister
+      puts "Finished removing #{name}"
     end
 
     def test
@@ -34,13 +39,36 @@ module Scotty
     def detect
       !detect_files.map do |file|
         file_exists? file
-      end.find(false)
+      end.include?(false)
     end
 
     private
 
+    def apt_install(packages)
+      exec "aptitude install -y #{packages}"
+    end
+
+    def wget(url)
+      exec "wget \"#{url}\""
+    end
+
+    def untar(file)
+      exec "tar xvzf #{file}"
+    end
+
+    def cd(dir = nil)
+      @directory = dir
+    end
+
+    def rm(file)
+      exec "rm -rf \"#{file}\""
+    end
+
     def exec(script)
-      result = server.ssh(script).first
+      [*script].map do |line|
+        line = "cd #{@directory} ; #{line}" if @directory
+        server.ssh(line).last
+      end.last
     end
 
     def file_exists?(file)
@@ -49,6 +77,26 @@ module Scotty
 
     def assert_stdout(script, check)
       !!exec(script).stdout.match(check)
+    end
+
+
+    def register
+      provides.each do |component|
+        server.metadata[component] = Time.now
+      end
+      update_metadata
+    end
+
+    def deregister
+      provides.each do |component|
+        server.metadata.delete(component)
+      end
+      update_metadata
+    end
+
+    def update_metadata
+      result = server.ssh %{echo "#{MultiJson.encode(server.metadata)}" > ~/metadata.json}
+      raise "Failed updating metadata for #{name}" unless result.last.status == 0
     end
 
     class << self

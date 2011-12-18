@@ -11,6 +11,10 @@ module Scotty
       @servers ||= Scotty::Servers.new(:provider => provider)
     end
 
+    def components
+      Scotty::Components.instance
+    end
+
 
   end
 end

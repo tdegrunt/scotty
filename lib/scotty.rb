@@ -3,6 +3,7 @@ require "scotty/config"
 require "scotty/servers"
 require "scotty/component"
 require "scotty/component_dsl"
+require "scotty/components"
 require "scotty/core"
 
 module Scotty
@@ -15,6 +16,7 @@ module Scotty
       load path + "scotty/servers.rb"
       load path + "scotty/component.rb"
       load path + "scotty/component_dsl.rb"
+      load path + "scotty/components.rb"
       load path + "scotty/core.rb"
     end
   end

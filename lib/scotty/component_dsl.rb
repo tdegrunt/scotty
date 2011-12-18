@@ -9,8 +9,8 @@ class Scotty::Component::DSL
     base.name = name
   end
 
-  def requires_apt(packages)
-    base.requires_apt = packages
+  def requires(packages)
+    base.requires = packages
   end
 
   def provides(packages)
@@ -25,12 +25,12 @@ class Scotty::Component::DSL
     base.detect_files = [*files]
   end
 
-  def install(script)
-    base.install_script = script.split("\n").compact
+  def install(&block)
+    base.install_proc = block
   end
 
-  def remove(script)
-    base.remove_script = script.split("\n").compact
+  def remove(&block)
+    base.remove_proc = block
   end
 
   def self.load(name)
