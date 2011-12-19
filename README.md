@@ -22,9 +22,9 @@ Three phases
 - Configure
  - Create configuration set
  - Show diff between current and new configuration
- - Install configation to servers
+ - Install configuration to servers
 - Activate
- - Start/Restart all services to activate new configation
+ - Start/Restart all services to activate new configuration
 
 
 
