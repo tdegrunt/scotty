@@ -1,9 +1,0 @@
-:fog:
-  :credentials:
-    :private_key_path: "~/.ssh/id_rsa"
-    :public_key_path: "~/.ssh/id_rsa.pub"
-  :compute:
-    :provider: 'Rackspace'
-    :rackspace_api_key: 'xxx'
-    :rackspace_username: 'xxx'
-    :rackspace_auth_url: 'lon.auth.api.rackspacecloud.com'

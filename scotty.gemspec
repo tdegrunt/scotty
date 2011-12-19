@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Scotty::VERSION
   s.authors     = ["Andre Meij", "Mark Kremer"]
   s.email       = ["andre@socialreferral.com", "mark@socialreferral.com"]
-  s.summary     = %q{Scotty, using Teleport and Fog to automate infrastructure}
+  s.summary     = %q{Scotty, Using Fog to automate infrastructure deployment and configuration management}
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -17,5 +17,5 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency "fog"
-  s.add_runtime_dependency "teleport"
+  s.add_runtime_dependency "configatron"
 end

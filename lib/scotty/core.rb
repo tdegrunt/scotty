@@ -1,20 +1,25 @@
 module Scotty
   class Core
+    include Singleton
+
     attr_accessor :provider
 
     def initialize
-      Fog.credentials = Scotty::Config.fog[:credentials]
-      @provider = Fog::Compute.new(Scotty::Config.fog[:compute])
+      Fog.credentials = configatron.fog.credentials.to_hash
     end
 
     def servers
-      @servers ||= Scotty::Servers.new(:provider => provider)
+      @servers ||= Scotty::Servers.new
     end
 
     def components
-      Scotty::Components.instance
+      @components ||= Scotty::Components.new
     end
 
+    def reload!
+      @server = nil
+      @components = nil
+    end
 
   end
 end

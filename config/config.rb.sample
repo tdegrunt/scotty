@@ -1,0 +1,8 @@
+
+configatron.fog.credentials.private_key_path = "~/.ssh/id_rsa"
+configatron.fog.credentials.public_key_path = "~/.ssh/id_rsa.pub"
+
+configatron.fog.compute.provider = 'Rackspace'
+configatron.fog.compute.rackspace_api_key = 'xxx'
+configatron.fog.compute.rackspace_username = 'xxx'
+configatron.fog.compute.rackspace_auth_url = 'lon.auth.api.rackspacecloud.com'

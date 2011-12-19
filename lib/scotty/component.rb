@@ -17,7 +17,6 @@ module Scotty
         puts "Testing #{name}"
         raise "Failed installing #{name}" if  !detect || !test
 
-        register
         puts "Finished installing #{name}"
       end
     end
@@ -28,7 +27,6 @@ module Scotty
 
       raise "Failed removing #{name}" if detect || test
 
-      deregister
       puts "Finished removing #{name}"
     end
 
@@ -40,6 +38,14 @@ module Scotty
       !detect_files.map do |file|
         file_exists? file
       end.include?(false)
+    end
+
+    def enable
+      raise "Not implemented"
+    end
+
+    def disable
+      raise "Not implemented"
     end
 
     private
@@ -77,21 +83,6 @@ module Scotty
 
     def assert_stdout(script, check)
       !!exec(script).stdout.match(check)
-    end
-
-
-    def register
-      provides.each do |component|
-        server.metadata[component] = Time.now
-      end
-      update_metadata
-    end
-
-    def deregister
-      provides.each do |component|
-        server.metadata.delete(component)
-      end
-      update_metadata
     end
 
     def update_metadata

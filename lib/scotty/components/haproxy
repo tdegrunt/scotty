@@ -1,0 +1,19 @@
+name "HA-Proxy"
+
+provides %w(haproxy)
+
+detect "/usr/sbin/haproxy"
+
+test { assert_stdout "haproxy -v", "HA-Proxy" }
+
+install do
+  apt_install "haproxy"
+end
+
+remove do
+  exec "aptitude remove -y haproxy"
+end
+
+
+# Stuff to do:
+# http://blogs.dixcart.com/public/technology/2011/01/load-balancing-and-failover-for-replicated-mysql.html

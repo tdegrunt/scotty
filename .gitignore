@@ -2,4 +2,5 @@
 .bundle
 Gemfile.lock
 pkg/*
-config/config.yml
+config/config.rb
+data/*
