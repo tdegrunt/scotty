@@ -3,5 +3,4 @@
 Gemfile.lock
 pkg/*
 config/config.rb
-data/roles/*
-data/configurations/*
+data/*
