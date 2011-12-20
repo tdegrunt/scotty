@@ -7,15 +7,16 @@ detect "/usr/local/bin/ruby1.9.2"
 test { assert_stdout "ruby -v", "ruby 1.9.2p290" }
 
 install do
-  apt_install "bison build-essential checkinstall libffi6 libssl-dev libyaml-dev zlib1g-dev"
+  exec "aptitude install -y bison build-essential checkinstall libffi6 libssl-dev libyaml-dev zlib1g-dev"
 
-  wget "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz"
+  exec "wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz"
   untar "ruby-1.9.2-p290.tar.gz"
 
-  cd "ruby-1.9.2-p290"
-  exec "./configure --prefix=/usr/local --program-suffix=1.9.2 --with-ruby-version=1.9.2 --disable-install-doc"
-  exec "make -j4"
-  exec 'checkinstall -D -y --fstrans=no --nodoc --pkgname="ruby1.9.2" --pkgversion="1.9.2-p290" --provides="ruby"'
+  cd "ruby-1.9.2-p290" do
+    exec "./configure --prefix=/usr/local --program-suffix=1.9.2 --with-ruby-version=1.9.2 --disable-install-doc"
+    exec "make -j4"
+    exec 'checkinstall -D -y --fstrans=no --nodoc --pkgname="ruby1.9.2" --pkgversion="1.9.2-p290" --provides="ruby"'
+  end
 
   cd
   rm "ruby-1.9.2-p290"
