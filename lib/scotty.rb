@@ -3,7 +3,7 @@ require "fog"
 require "singleton"
 require "configatron"
 
-require "config/config.rb"
+require "data/config.rb"
 
 require "scotty/version"
 require "scotty/server"
@@ -18,7 +18,7 @@ module Scotty
   class Init
     def self.reload!
       path = File.dirname(__FILE__) + "/"
-      load path + "../config/config.rb"
+      load path + "../data/config.rb"
       load path + "scotty.rb"
       load path + "scotty/server.rb"
       load path + "scotty/servers.rb"

@@ -21,11 +21,11 @@ module Scotty
     end
 
     def ssh(*args)
-      fog.ssh args
+      fog.ssh *args
     end
 
     def scp(*args)
-      fog.scp args
+      fog.scp *args
     end
 
     def fog

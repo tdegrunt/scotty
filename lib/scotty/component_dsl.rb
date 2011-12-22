@@ -9,20 +9,16 @@ class Scotty::Component::DSL
     base.name = name
   end
 
-  def requires(packages)
-    base.requires = packages
-  end
-
-  def provides(packages)
-    base.provides = packages
+  def config(&block)
+    base.config_proc = block
   end
 
   def test(&block)
     base.test_proc = block
   end
 
-  def detect(files)
-    base.detect_files = [*files]
+  def configure(&block)
+    base.configure_proc = block
   end
 
   def install(&block)
@@ -33,9 +29,12 @@ class Scotty::Component::DSL
     base.remove_proc = block
   end
 
-  def self.load(name)
+    def self.load(server, role, name)
     component = new
-    component.instance_eval(File.open("#{File.dirname(__FILE__)}/components/#{name}").read)
+    component.base.server = server
+    component.base.role = role
+    component.base.path = "#{File.dirname(__FILE__)}/../../data/roles/#{role}/#{name}"
+    component.instance_eval(File.open("#{component.base.path}/scotty.rb").read)
     component.base
   end
 

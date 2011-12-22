@@ -23,3 +23,11 @@ module Scotty
 
   end
 end
+
+# HACKS
+
+class Configatron::Store
+  def to_s
+    ""
+  end
+end
