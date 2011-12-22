@@ -6,12 +6,13 @@ require "configatron"
 require "data/config.rb"
 
 require "scotty/version"
+require "scotty/erb_template_binding"
 require "scotty/server"
 require "scotty/servers"
 require "scotty/component"
 require "scotty/component_dsl"
-require "scotty/components"
-require "scotty/configuration"
+require "scotty/role"
+require "scotty/execute"
 require "scotty/core"
 
 module Scotty
@@ -20,13 +21,15 @@ module Scotty
       path = File.dirname(__FILE__) + "/"
       load path + "../data/config.rb"
       load path + "scotty.rb"
+      load path + "scotty/erb_template_binding.rb"
       load path + "scotty/server.rb"
       load path + "scotty/servers.rb"
       load path + "scotty/component.rb"
       load path + "scotty/component_dsl.rb"
-      load path + "scotty/components.rb"
-      load path + "scotty/configuration.rb"
+      load path + "scotty/role.rb"
+      load path + "scotty/execute.rb"
       load path + "scotty/core.rb"
+      Scotty::Core.instance.servers.refresh
     end
   end
 end

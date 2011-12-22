@@ -21,6 +21,10 @@ class Scotty::Component::DSL
     base.configure_proc = block
   end
 
+  def configure_group(&block)
+    base.configure_group_proc = block
+  end
+
   def install(&block)
     base.install_proc = block
   end
@@ -29,12 +33,10 @@ class Scotty::Component::DSL
     base.remove_proc = block
   end
 
-    def self.load(server, role, name)
+    def self.load(path)
     component = new
-    component.base.server = server
-    component.base.role = role
-    component.base.path = "#{File.dirname(__FILE__)}/../../data/roles/#{role}/#{name}"
-    component.instance_eval(File.open("#{component.base.path}/scotty.rb").read)
+    component.base.path = path
+    component.instance_eval(File.open("#{path}/scotty.rb").read)
     component.base
   end
 

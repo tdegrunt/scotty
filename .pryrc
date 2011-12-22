@@ -10,3 +10,4 @@ def reload!
   @scotty = Scotty::Core.instance
   !!@scotty
 end
+

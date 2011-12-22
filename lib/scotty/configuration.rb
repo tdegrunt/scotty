@@ -15,8 +15,6 @@ module Scotty
 
   class Configuration
 
-
-
     def name
       @name ||= "#{Time.now.strftime("%Y%m%d%H%M")}"
     end
@@ -48,7 +46,6 @@ module Scotty
         end
       end
     end
-
 
     private
 

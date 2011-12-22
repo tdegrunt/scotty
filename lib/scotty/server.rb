@@ -1,5 +1,6 @@
 module Scotty
   class Server
+
     def initialize(fog_server)
       @fog_server = fog_server
     end
@@ -17,7 +18,7 @@ module Scotty
     end
 
     def role
-      @role ||= fog.ssh("cat .role").last.stdout.strip.to_sym
+      @role ||= Scotty::Role.new(:name => fog.ssh("cat .role").last.stdout.strip)
     end
 
     def ssh(*args)
@@ -31,5 +32,6 @@ module Scotty
     def fog
       @fog_server
     end
+
   end
 end

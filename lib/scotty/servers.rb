@@ -7,14 +7,20 @@ module Scotty
 
     # :flavor_id => 1, :image_id => 119, :name => 'myserver'
     def create(options = {})
+      raise "Name required" unless options[:name]
+      raise "Name should be unique" if all.find {|server| server.name == options[:name]}
+
+      options = configatron.server_specification.to_hash.merge(options)
+
       puts "Initializing new server"
-      server = provider.servers.bootstrap(options)
+      raise options
+      server = Server.new(provider.servers.bootstrap(options))
       puts "Updating"
       server.ssh("aptitude update")
       server.ssh("aptitude upgrade -y")
-      server.ssh "echo #{options[:role]} > .role" if options[:role]
       puts "Completed"
 
+      all << server
       server
     end
 
@@ -22,13 +28,12 @@ module Scotty
       @provider.servers
     end
 
-
     def [](name)
       all.find { |server| server.name == name }
     end
 
     def role(role)
-      all.select { |server| server.role == role }
+      all.select { |server| server.role.name == role.name }
     end
 
     def all
