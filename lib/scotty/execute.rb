@@ -10,19 +10,22 @@ module Scotty
 
     def install()
       unless test
-        puts "Installing #{component.name}"
+        log "installing #{component.name}"
         eval_with_config component.install_proc
         raise "Failed installing #{component.name}" if !test
       end
+      true
     end
 
     def configure
-      puts "Configuring #{component.name}"
+      log "configuring #{component.name}"
       eval_with_config component.configure_proc
+      true
     end
 
     def configure_group
       eval_with_config component.configure_group_proc
+      true
     end
 
     def test
@@ -30,9 +33,10 @@ module Scotty
     end
 
     def remove
-      puts "Removing #{component.name}"
+      log "removing #{component.name}"
       eval_with_config component.remove_proc
       raise "Failed removing #{component.name}" if test
+      true
     end
 
     private
@@ -49,15 +53,16 @@ module Scotty
     end
 
     def exec(script)
-      puts "#{server.name}: exec '#{script}'"
+      log "exec '#{script}'"
       [*script].map do |line|
         server.ssh(line.gsub("\n", " ; ")).last
       end.last
     end
 
     def copy(file_name, remote_file = nil)
-      puts "#{server.name}: copy: '#{file_name}'"
+      log "copy '#{file_name}'"
       local_file = "#{path}/#{file_name}"
+      parsed_file = nil
 
       if file_name.split('.').last == "erb"
         file_name = file_name.gsub(".erb", "")
@@ -70,6 +75,7 @@ module Scotty
       end
 
       server.scp(local_file, (remote_file || file_name))
+      File.delete(parsed_file) if parsed_file
     end
 
     def dpkg_install(package)
@@ -107,6 +113,10 @@ module Scotty
         instance_eval(&component.config_proc) if component.config_proc
         instance_eval(&block) if block
       end
+    end
+
+    def log(message)
+      puts "#{server.name}: #{message}"
     end
   end
 end

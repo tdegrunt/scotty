@@ -13,7 +13,6 @@ module Scotty
       options = configatron.server_specification.to_hash.merge(options)
 
       puts "Initializing new server"
-      raise options
       server = Server.new(provider.servers.bootstrap(options))
       puts "Updating"
       server.ssh("aptitude update")

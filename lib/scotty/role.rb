@@ -11,86 +11,74 @@ module Scotty
       Dir["#{path}/*"].map do |component_path|
         if File.directory?(component_path)
           component = Component::DSL.load(component_path)
-          @components[component.name.to_sym] = component
+          @components[component_path.split("/").last.to_sym] = component
         end
       end
       @components
     end
 
     def servers
-      @servers = {}
-      Scotty::Core.instance.servers.role(self).each do |server|
-        @servers[server.name.to_sym] = server
-      end
-      @servers
+      Scotty::Core.instance.servers.role(self)
     end
 
     def add_server(options = {})
-      with_config do
+      server = with_config do
         Scotty::Core.instance.servers.create(options)
       end
       server.ssh "echo #{name} > .role"
-      install_on(server)
+      install(:server => server)
       server
     end
 
-    def install
-      servers.each_value do |server|
-        install_on(server)
-      end
+    def install(options = {})
+      execute(:install, options)
     end
 
-    def install_on(server)
-      with_config do
-        components.each_value do |component|
-          Scotty::Execute.new(:server => server, :role => self, :component => component).install
-        end
-      end
+    def test(options = {})
+      execute(:test, options)
     end
 
-    def configure
-      servers.each_value do |server|
-        configure_on(server)
-      end
-      configure_group
+    def configure(options = {})
+      execute(:configure, options)
     end
 
-    def configure_on(server)
-      with_config do
-        components.each_value do |component|
-          Scotty::Execute.new(:server => server, :role => self, :component => component).configure
-        end
-      end
+    def configure_group(options = {})
+      execute(:configure_group, options)
     end
 
-    def configure_group
-      with_config do
-        components.each_value do |component|
-          Scotty::Execute.new(:server => Scotty::Core.instance.servers.role(self).first, :role => self, :component => component).configure_group
-        end
-      end
-    end
-
-
-    def remove
-      servers.each_value do |server|
-        remove_from(server)
-      end
-    end
-
-    def remove_from(server)
-      with_config do
-        components.each_value do |component|
-          Scotty::Execute.new(:server => server, :role => self, :component => component).remove
-        end
-      end
+    def remove(options = {})
+      execute(:remove, options)
     end
 
     private
 
+    def execute(action, options = {})
+      options[:server] ||= servers
+      options[:component] ||= components
+
+      results = []
+
+      with_config do
+        [*action].each do |action|
+          [*options[:server]].each do |server|
+            [*options[:component]].each do |component|
+              component = component[1] if component.is_a?(Array)
+              component = components[component] if component.is_a?(Symbol)
+
+              results << Scotty::Execute.new(:server => server, :role => self, :component => component).send(action.to_sym)
+            end
+          end
+        end
+      end
+      results
+    end
+
     def with_config
       configatron.temp do
-        load "#{path}/config.rb"
+        def config
+          configatron
+        end
+        instance_eval File.open("#{path}/config.rb").read
         yield
       end
     end
