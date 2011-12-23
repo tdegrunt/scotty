@@ -59,7 +59,7 @@ module Scotty
       end.last
     end
 
-    def copy(file_name, remote_file = nil)
+    def copy(file_name, remote_file = nil, options = {})
       log "copy '#{file_name}'"
       local_file = "#{path}/#{file_name}"
       parsed_file = nil
@@ -74,7 +74,7 @@ module Scotty
         local_file = parsed_file
       end
 
-      server.scp(local_file, (remote_file || file_name))
+      server.scp(local_file, (remote_file || file_name), options)
       File.delete(parsed_file) if parsed_file
     end
 

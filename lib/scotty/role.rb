@@ -43,6 +43,7 @@ module Scotty
     end
 
     def configure_group(options = {})
+      options[:server] ||= servers.first
       execute(:configure_group, options)
     end
 
@@ -78,7 +79,7 @@ module Scotty
         def config
           configatron
         end
-        instance_eval File.open("#{path}/config.rb").read
+        instance_eval File.open("#{path}/config.rb").read rescue nil
         yield
       end
     end
