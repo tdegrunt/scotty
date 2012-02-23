@@ -41,7 +41,8 @@ module Scotty
 
     def refresh
       # FIXME: HACK, only loading server named '*test*'
-      @servers = @provider.servers.select{|server| server.name =~ /test/}.map{ |server| Server.new(server) }
+      #@servers = @provider.servers.select{|server| server.name =~ /test/}.map{ |server| Server.new(server) }
+      @servers = @provider.servers.map{ |server| Server.new(server) }
     end
 
     private

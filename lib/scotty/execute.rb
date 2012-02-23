@@ -53,7 +53,7 @@ module Scotty
     end
 
     def exec(script)
-      log "exec '#{script}'"
+      log "exec '#{cd} #{script}'"
       [*script].map do |line|
         server.ssh(line.gsub("\n", " ; ")).last
       end.last
@@ -61,21 +61,34 @@ module Scotty
 
     def copy(file_name, remote_file = nil, options = {})
       log "copy '#{file_name}'"
-      local_file = "#{path}/#{file_name}"
-      parsed_file = nil
 
-      if file_name.split('.').last == "erb"
-        file_name = file_name.gsub(".erb", "")
+      remote_file = "#{home_directory}/#{remote_file}" unless !home_directory || (remote_file && remote_file[0] == "/")
+
+      local_file = case
+        when File.exists?("#{path}/#{file_name}.#{role}.erb")
+          "#{path}/#{file_name}.#{role}.erb"
+        when File.exists?("#{path}/#{file_name}.#{role}")
+          "#{path}/#{file_name}.#{role}"
+        when File.exists?("#{path}/#{file_name}.erb")
+          "#{path}/#{file_name}.erb"
+        when File.exists?("#{path}/#{file_name}")
+          "#{path}/#{file_name}"
+        else
+          raise "Cannot open file #{file_name}"
+      end
+
+      if local_file.split('.').last == "erb"
         parsed_file = "#{local_file}.parsed"
 
         File.open(parsed_file, "w") do |file|
           file.write(ERB.new(File.open(local_file).read, 0, "%<>").result(template_binding))
         end
-        local_file = parsed_file
-      end
 
-      server.scp(local_file, (remote_file || file_name), options)
-      File.delete(parsed_file) if parsed_file
+        server.scp(parsed_file, (remote_file || file_name), options)
+        File.delete(parsed_file)
+      else
+        server.scp(local_file, (remote_file || file_name), options)
+      end
     end
 
     def dpkg_install(package)
@@ -108,9 +121,18 @@ module Scotty
       configatron
     end
 
+    def home_directory(dir = nil)
+      @home_directory = dir if dir
+      @home_directory
+    end
+
+    def cd
+      "cd #{@home_directory} ; " if @home_directory
+    end
+
     def eval_with_config(block)
       configatron.temp do
-        instance_eval(&component.config_proc) if component.config_proc
+        instance_eval(&Scotty::Core.instance.config_proc) if Scotty::Core.instance.config_proc
         instance_eval(&block) if block
       end
     end

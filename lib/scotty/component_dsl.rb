@@ -33,12 +33,12 @@ class Scotty::Component::DSL
     base.remove_proc = block
   end
 
-    def self.load(path)
+  def self.load(name)
+    path = "/data/dev/scotty/data/components/#{name}"
     component = new
     component.base.path = path
     component.instance_eval(File.open("#{path}/scotty.rb").read)
     component.base
   end
-
 end
 

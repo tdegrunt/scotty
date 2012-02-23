@@ -1,38 +1,39 @@
 module Scotty
+
+  class HashArray < Array
+    def [](*args)
+      if args.size == 1 && (args.first.is_a?(Hash))
+        key, value = args.first.first
+        find{|item| item.respond_to?(key) && item.send(key) == value}
+      else
+        super
+      end
+    end
+  end
+
+
   class Core
     include Singleton
 
-    attr_accessor :provider
+    attr_accessor :provider, :config_proc
 
     def initialize
+      EnvironmentDsl.load(self, "/data/dev/scotty/data/scotty.rb")
       Fog.credentials = configatron.fog.credentials.to_hash
+    end
+
+    def roles
+      @roles ||= HashArray.new
     end
 
     def servers
       @servers ||= Scotty::Servers.new
     end
 
-    def roles
-      unless @roles
-        @roles = {}
-        Dir["#{File.dirname(__FILE__)}/../../data/roles/*"].each do |role|
-          role = role.split('/').last
-          @roles[role.to_sym] = Scotty::Role.new(:name => role)
-        end
-      end
-      @roles
-    end
-
-    def components
-      @components ||= Scotty::Components.new
-    end
-
     def reload!
-      @server = nil
-      @roles = nil
-      @components = nil
+      @servers = nil
+      initialize
     end
-
   end
 end
 
